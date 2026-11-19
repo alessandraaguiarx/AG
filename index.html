@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setor de Instalações - Gestão de Obra</title>
+
+    <link rel="preconnect" href="https://googleapis.com">
+    <link href="https://googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="overlay">
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav>
+        <div class="logo">INSTALAÇÕES | OBRA</div>
+        <ul>
+            <li><a href="#" onclick="abrirGuia('pendencias', event)" class="nav-link active">Pendências das Torres</a></li>
+            <li><a href="#" onclick="abrirGuia('materiais', event)" class="nav-link">Solicitação de Materiais</a></li>
+            <li><a href="#" onclick="abrirGuia('planilhas', event)" class="nav-link">Planilhas</a></li>
+            <li><a href="#" onclick="abrirGuia('drive', event)" class="nav-link">Pastas Drive</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO COMPACTO -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Setor de Instalações Prediais</h1>
+            <p>
+                Central de controle de pendências por torre, solicitações de materiais, planilhas sincronizadas e acervo de projetos da obra.
+            </p>
+            <div class="tabs-bar">
+                <button class="tab-btn active" onclick="abrirGuia('pendencias', event)">Pendências das Torres</button>
+                <button class="tab-btn" onclick="abrirGuia('materiais', event)">Solicitação de Materiais</button>
+                <button class="tab-btn" onclick="abrirGuia('planilhas', event)">Guia de Planilhas</button>
+                <button class="tab-btn" onclick="abrirGuia('drive', event)">Pastas do Google Drive</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- ==========================================
+             GUIA 1: PENDÊNCIAS DAS TORRES
+        =========================================== -->
+        <section id="guia-pendencias" class="guia-secao active">
+            <div class="card">
+                <div class="panel-header">
+                    <div>
+                        <h2>Pendências das Torres</h2>
+                        <p id="status-sync-pendencias" class="sync-text">Sincronizando com Google Planilhas...</p>
+                    </div>
+                    <button onclick="carregarPendencias()" class="btn btn-sync">Atualizar Planilha</button>
+                </div>
+
+                <!-- FILTROS -->
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <label for="filtroTorre">Torre / Bloco:</label>
+                        <select id="filtroTorre" onchange="filtrarPendencias()">
+                            <option value="TODAS">Todas as Torres</option>
+                            <option value="Torre A">Torre A</option>
+                            <option value="Torre B">Torre B</option>
+                            <option value="Torre C">Torre C</option>
+                            <option value="Embasamento">Embasamento / Áreas Comuns</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="filtroDisciplina">Disciplina:</label>
+                        <select id="filtroDisciplina" onchange="filtrarPendencias()">
+                            <option value="TODAS">Todas as Disciplinas</option>
+                            <option value="Elétrica">Elétrica</option>
+                            <option value="Hidráulica">Hidráulica</option>
+                            <option value="Incêndio">Combate a Incêndio</option>
+                            <option value="Climatização">Climatização / Gás</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="filtroStatusPendencia">Status:</label>
+                        <select id="filtroStatusPendencia" onchange="filtrarPendencias()">
+                            <option value="TODOS">Todos os Status</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em andamento">Em andamento</option>
+                            <option value="Concluído">Concluído</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="buscaPendencia">Buscar Pavimento / Descrição:</label>
+                        <input type="text" id="buscaPendencia" onkeyup="filtrarPendencias()" placeholder="Ex: 5º Pav, Prumada, QDC...">
+                    </div>
+                </div>
+
+                <!-- TABELA DE PENDÊNCIAS -->
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr id="cabecalho-pendencias">
+                                <th>Torre</th>
+                                <th>Pavimento / Local</th>
+                                <th>Disciplina</th>
+                                <th>Descrição da Pendência</th>
+                                <th>Responsável</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpo-pendencias">
+                            <tr><td colspan="6" style="text-align:center;">Carregando pendências...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             GUIA 2: SOLICITAÇÕES DE MATERIAIS
+        =========================================== -->
+        <section id="guia-materiais" class="guia-secao">
+            
+            <!-- FORMULÁRIO DE NOVA SOLICITAÇÃO -->
+            <div class="card">
+                <h2>Nova Solicitação de Material</h2>
+                <p style="margin-bottom: 20px;">Preencha os dados abaixo para registrar um pedido de material para o setor de compras/almoxarifado:</p>
+
+                <form id="formMaterial" onsubmit="enviarSolicitacaoMaterial(event)">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="matTorre">Torre / Destino:</label>
+                            <select id="matTorre" required>
+                                <option value="Torre A">Torre A</option>
+                                <option value="Torre B">Torre B</option>
+                                <option value="Torre C">Torre C</option>
+                                <option value="Embasamento">Embasamento / Subsolo</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="matDisciplina">Disciplina:</label>
+                            <select id="matDisciplina" required>
+                                <option value="Elétrica">Elétrica</option>
+                                <option value="Hidráulica">Hidráulica</option>
+                                <option value="Incêndio">Combate a Incêndio</option>
+                                <option value="Climatização">Climatização / Gás</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="matDescricao">Material / Especificação:</label>
+                            <input type="text" id="matDescricao" placeholder="Ex: Tubo PVC Soldável 50mm" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="matQuantidade">Quantidade e Unidade:</label>
+                            <input type="text" id="matQuantidade" placeholder="Ex: 30 barras / 200 metros" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="matUrgencia">Prioridade:</label>
+                            <select id="matUrgencia" required>
+                                <option value="Normal">Normal</option>
+                                <option value="Urgente">Urgente (Frente parada)</option>
+                                <option value="Programada">Programada</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="matSolicitante">Solicitante:</label>
+                            <input type="text" id="matSolicitante" placeholder="Seu nome" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-calc">Registrar Solicitação</button>
+                </form>
+                <p id="msg-envio-material" style="margin-top: 15px; font-weight: 600; color: #34d399;"></p>
+            </div>
+
+            <!-- TABELA DE MATERIAIS SOLICITADOS (VINDA DA PLANILHA) -->
+            <div class="card">
+                <div class="panel-header">
+                    <div>
+                        <h2>Acompanhamento de Pedidos (Planilha)</h2>
+                        <p id="status-sync-materiais" class="sync-text">Sincronizando pedidos...</p>
+                    </div>
+                    <button onclick="carregarMateriais()" class="btn btn-sync">Atualizar Pedidos</button>
+                </div>
+
+                <div class="table-responsive" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr id="cabecalho-materiais">
+                                <th>Data</th>
+                                <th>Torre</th>
